@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>2M2A - Full Suite (Improved)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{margin:0;padding:20px;font-family:'Segoe UI',Arial,sans-serif;background:radial-gradient(ellipse at center,#0a0f2a 0%,#03050b 100%);color:white;display:flex;justify-content:center;align-items:center;min-height:100vh;text-align:center;flex-direction:column;position:relative}
+.stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.star{position:absolute;background:white;border-radius:50%;animation:moveUp linear infinite}
+@keyframes moveUp{0%{transform:translateY(100vh);opacity:0.8}100%{transform:translateY(-20vh);opacity:0}}
+.container{max-width:600px;width:95%;margin:auto;position:relative;z-index:1;background:rgba(10,15,40,0.6);backdrop-filter:blur(10px);border-radius:24px;padding:25px 15px;border:1px solid rgba(255,255,255,0.2)}
+.hidden{display:none}
+button,.btn,.menu-btn{padding:10px 16px;margin:5px;border:none;border-radius:12px;color:white;background:linear-gradient(135deg,#ff9a9e,#fad0c4);cursor:pointer;font-size:14px;font-weight:600;transition:0.2s}
+button:hover{transform:translateY(-2px)}
+input,select{padding:10px;width:85%;border-radius:12px;border:1px solid rgba(255,255,255,0.3);text-align:center;margin:8px auto;background:rgba(255,255,255,0.1);color:white}
+.result-box{margin:15px auto;padding:12px;background:rgba(0,0,0,0.3);border-radius:16px}
+h1{font-size:26px;background:linear-gradient(135deg,#fff,#ff9a9e);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h2{font-size:22px;margin-bottom:15px;color:#ff9a9e}
+.back-btn{background:linear-gradient(135deg,#667eea,#764ba2)}
+.popup-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);justify-content:center;align-items:center;z-index:1000}
+.popup-content{background:linear-gradient(135deg,#1a1f3a,#0f1328);border-radius:20px;padding:25px;width:320px;max-width:90%;text-align:center}
+.shape-popup-input{width:90%;padding:10px;margin:10px 0;border-radius:12px;border:1px solid #ff9a9e;background:rgba(255,255,255,0.1);color:white;font-size:14px;text-align:center}
+.shape-popup-buttons{display:flex;gap:10px;justify-content:center;margin-top:15px}
+.shape-popup-buttons button{padding:8px 20px;margin:0}
+.shape-category-btn{background:linear-gradient(135deg,#667eea,#764ba2);padding:15px;font-size:18px;margin:5px;width:90%}
+.shape-sub-buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0}
+.shape-sub-buttons button{background:linear-gradient(135deg,#3a3f6e,#2a2f5e);padding:12px}
+.developer-credit{font-size:11px;color:#aaa;margin-top:15px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.1)}
+.math-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:15px auto}
+.physics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin:15px 0;max-height:400px;overflow-y:auto}
+.physics-grid button{font-size:11px;padding:8px 5px}
+.currency-converter,.trans-section{background:rgba(0,0,0,0.3);border-radius:20px;padding:15px;margin:10px 0}
+.unit-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 0}
+.unit-row select{width:40%;margin:0}
+.unit-row input{width:55%;margin:0}
+.converters-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0}
+.converter-panel{display:none}
+.converter-panel.active{display:block}
+.click-area{background:#ff8c42;padding:50px;border-radius:70px;margin:15px;cursor:pointer;font-size:1.8rem;font-weight:bold;text-align:center;box-shadow:0 10px 0 #b13e00;transition:0.05s linear}
+.click-area:active{transform:translateY(4px);box-shadow:0 6px 0 #b13e00}
+.memory-numbers{font-size:2rem;letter-spacing:15px;font-weight:bold;margin:15px;padding:20px;background:rgba(0,0,0,0.4);border-radius:20px;font-family:monospace}
+.graph-canvas-container{background:#0a0c1a;border-radius:20px;padding:10px;margin:15px 0}
+canvas{background:#0a0c1a;display:block;margin:0 auto;border-radius:12px;width:100%;height:auto;border:1px solid #444}
+.graph-points-area{background:rgba(0,0,0,0.3);border-radius:16px;padding:10px;margin:10px 0}
+.graph-points-area input{width:70px;margin:5px;display:inline-block}
+.graph-points-area button{padding:6px 12px;font-size:12px}
+.transform-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:15px 0}
+.transform-grid button{padding:10px;background:linear-gradient(135deg,#43e97b,#38f9d7);color:#000}
+.tool-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0}
+#puzzleOptions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:15px auto;width:100%}
+#puzzleOptions button{width:100%;padding:12px;font-size:16px;font-weight:bold}
+.correct-answer{animation:correctPulse 0.5s ease}
+@keyframes correctPulse{0%{transform:scale(1);background:#ff9a9e}50%{transform:scale(1.05);background:#4caf50}100%{transform:scale(1);background:#ff9a9e}}
+.age-input-group{display:flex;gap:10px;justify-content:center;margin:15px 0}
+.age-input-group input{width:80px;margin:0}
+.shape-selector{background:rgba(255,255,255,0.1);border-radius:8px;padding:8px;margin:10px 0;color:#ff9a9e;font-size:14px}
+</style>
+</head>
+<body>
+
+<div class="stars" id="starsContainer"></div>
+<div class="container">
+
+<div id="welcome">
+    <h1>✨ 2M2A ✨</h1>
+    <p>Math · Physics · Shapes · Converters · Games · Graphing</p>
+    <button id="startBtn">🚀 START</button>
+    <div class="developer-credit">Mustafa Ahmed · Ali Saif · Ameer Ghaith · Mustafa Khorsheed</div>
+</div>
+
+<!-- MAIN MENU -->
+<div id="menu" class="hidden">
+    <h2>📱 MAIN MENU</h2>
+    <div class="tool-grid">
+        <button class="menu-btn" onclick="showPage('math')">🧮 MATH</button>
+        <button class="menu-btn" onclick="showPage('physicsPage')">⚡ PHYSICS</button>
+        <button class="menu-btn" onclick="showPage('shapesPage')">🎨 SHAPES</button>
+        <button class="menu-btn" onclick="showPage('convertersPage')">🔄 CONVERTERS</button>
+        <button class="menu-btn" onclick="showPage('graphingPage')">📈 GRAPHING</button>
+        <button class="menu-btn" onclick="showPage('gamePuzzle')">🧩 MATH PUZZLE</button>
+        <button class="menu-btn" onclick="showPage('gameClick')">⚡ FAST CLICK</button>
+        <button class="menu-btn" onclick="showPage('gameMemory')">🧠 MEMORY GAME</button>
+        <button class="menu-btn" onclick="showPage('gameMath')">➕ QUICK MATH</button>
+        <button class="menu-btn" onclick="showPage('percentagePage')">📊 PERCENTAGE</button>
+        <button class="menu-btn" onclick="showPage('meanPage')">📈 MEAN</button>
+        <button class="menu-btn" onclick="showPage('bmiPage')">❤️ BMI</button>
+        <button class="menu-btn" onclick="showPage('agePage')">🎂 AGE</button>
+        <button class="menu-btn" onclick="showPage('loanPage')">💵 LOAN</button>
+    </div>
+</div>
+
+<!-- MATH PAGE -->
+<div id="math" class="hidden">
+    <h2>🧮 Scientific Calculator</h2>
+    <input id="mathInput" placeholder="e.g., 5+3*2, sin(30*pi/180)">
+    <div class="math-grid">
+        <button onclick="addMath('+')">+</button><button onclick="addMath('-')">-</button>
+        <button onclick="addMath('*')">×</button><button onclick="addMath('/')">÷</button>
+        <button onclick="addMath('**')">^</button><button onclick="addMath('%')">%</button>
+        <button onclick="addMath('Math.sqrt(')">√</button><button onclick="addMath('Math.PI')">π</button>
+        <button onclick="addMath('Math.sin(')">sin</button><button onclick="addMath('Math.cos(')">cos</button>
+        <button onclick="addMath('Math.tan(')">tan</button>
+    </div>
+    <div><button onclick="clearMath()">🗑 Clear</button><button onclick="calculateMath()">= Calculate</button></div>
+    <div class="result-box"><div id="mathRes">📊 Result: ---</div></div>
+    <button class="back-btn" onclick="showPage('menu')">🔙 BACK</button>
+</div>
+
+<!-- PHYSICS PAGE - 20 LAWS -->
+<div id="physicsPage" class="hidden">
+    <h2>⚡ Physics Laws (20 Laws)</h2>
+    <div class="physics-grid" id="physicsGrid"></div>
+    <button class="back-btn" onclick="showPage('menu')">🔙 BACK</button>
+</div>
+
+<!-- SHAPES PAGE -->
+<div id="shapesPage" class="hidden">
+    <h2>🎨 SHAPES</h2>
+    <button class="shape-category-btn" onclick="toggleShapes('2d')">📐 2D SHAPES (Area)</button>
+    <div id="shapes2d" class="hidden">
+        <div class="shape-sub-buttons">
+            <button onclick="openShapePopup('square','2d')">⬛ Square</button>
+            <button onclick="openShapePopup('rectangle','2d')">📏 Rectangle</button>
+            <button onclick="openShapePopup('circle','2d')">⚪ Circle</button>
+            <button onclick="openShapePopup('triangle','2d')">🔺 Triangle</button>
+            <button onclick="openShapePopup('parallelogram','2d')">🔷 Parallelogram</button>
+            <button onclick="openShapePopup('trapezoid','2d')">📐 Trapezoid</button>
+            <button onclick="openShapePopup('ellipse','2d')">🥚 Ellipse</button>
+            <button onclick="openShapePopup('hexagon','2d')">⬡ Regular Hexagon</button>
+        </div>
+    </div>
+    <button class="shape-category-btn" onclick="toggleShapes('3d')">🧊 3D SHAPES (Volume / Surface Area)</button>
+    <div id="shapes3d" class="hidden">
+        <div class="shape-sub-buttons"> 
+            <button onclick="openShapePopup('cube','3d')">📦 Cube</button>
+            <button onclick="openShapePopup('sphere','3d')">⚽ Sphere</button>
+            <button onclick="openShapePopup('cone','3d')">📐 Cone</button>
+            <button onclick="openShapePopup('pyramid','3d')">🔺 Pyramid</button>
+            <button onclick="openShapePopup('cylinder','3d')">🧴 Cylinder</button>
+            <button onclick="openShapePopup('rectangular prism','3d')">📏 Rectangular Prism</button>
+        </div>
+    </div>
+    <button class="back-btn" onclick="showPage('menu')">🔙 BACK</button>
+</div>
+
+<!-- CONVERTERS PAGE -->
+<div id="convertersPage" class="hidden">
+    <h2>🔄 CONVERTERS</h2>
+    <div class="converters-grid">
+        <button class="converter-sub-btn" onclick="showConverter('currency')">💱 CURRENCY</button>
+        <button class="converter-sub-btn" onclick="showConverter('temp')">🌡️ TEMP</button>
+        <button class="converter-sub-btn" onclick="showConverter('weight')">⚖️ WEIGHT</button>
+        <button class="converter-sub-btn" onclick="showConverter('length')">📏 LENGTH</button>
+        <button class="converter-sub-btn" onclick="showConverter('speed')">🚀 SPEED</button>
+        <button class="converter-sub-btn" onclick="showConverter('volume')">🧊 VOLUME</button>
+        <button class="converter-sub-btn" onclick="showConverter('digital')">💾 DIGITAL</button>
+    </div>
+    <div id="currencyConv" class="converter-panel"><div class="currency-converter"><h3>Currency</h3><div class="unit-row"><select id="fromCurrency"><option value="USD">USD</option><option value="EUR">EUR</option><option value="IQD" selected>IQD</option></select><input type="number" id="fromAmount" value="1"></div><div class="unit-row"><select id="toCurrency"><option value="USD">USD</option><option value="EUR">EUR</option><option value="IQD">IQD</option></select><input type="text" id="toAmount" readonly></div><button onclick="convertCurrency()">Convert</button></div></div>
+    <div id="tempConv" class="converter-panel"><div class="trans-section"><h3>Temperature</h3><div class="unit-row"><select id="heatFrom"><option value="C">°C</option><option value="F">°F</option></select><input type="number" id="heatAmount" value="0"></div><div class="unit-row"><select id="heatTo"><option value="C">°C</option><option value="F">°F</option></select><input type="text" id="heatResult" readonly></div><button onclick="convertHeat()">Convert</button></div></div>
+    <div id="weightConv" class="converter-panel"><div class="trans-section"><h3>Weight</h3><div class="unit-row"><select id="weightFrom"><option value="kg">kg</option><option value="lb">lb</option></select><input type="number" id="weightAmount" value="1"></div><div class="unit-row"><select id="weightTo"><option value="kg">kg</option><option value="lb">lb</option></select><input type="text" id="weightResult" readonly></div><button onclick="convertWeight()">Convert</button></div></div>
+    <div id="lengthConv" class="converter-panel"><div class="trans-section"><h3>Length</h3><div class="unit-row"><select id="lengthFrom"><option value="m">m</option><option value="cm">cm</option><option value="inch">inch</option></select><input type="number" id="lengthAmount" value="1"></div><div class="unit-row"><select id="lengthTo"><option value="m">m</option><option value="cm">cm</option><option value="inch">inch</option></select><input type="text" id="lengthResult" readonly></div><button onclick="convertLength()">Convert</button></div></div>
+    <div id="speedConv" class="converter-panel"><div class="trans-section"><h3>Speed</h3><div class="unit-row"><select id="speedFrom"><option value="mps">m/s</option><option value="kmph">km/h</option></select><input type="number" id="speedAmount" value="1"></div><div class="unit-row"><select id="speedTo"><option value="mps">m/s</option><option value="kmph">km/h</option></select><input type="text" id="speedResult" readonly></div><button onclick="convertSpeed()">Convert</button></div></div>
+    <div id="volumeConv" class="converter-panel"><div class="trans-section"><h3>Volume</h3><div class="unit-row"><select id="volumeFrom"><option value="L">Liter</option><option value="m3">m³</option></select><input type="number" id="volumeAmount" value="1"></div><div class="unit-row"><select id="volumeTo"><option value="L">Liter</option><option value="m3">m³</option></select><input type="text" id="volumeResult" readonly></div><button onclick="convertVolume()">Convert</button></div></div>
+    <div id="digitalConv" class="converter-panel"><div class="trans-section"><h3>Digital</h3><div class="unit-row"><select id="digitalFrom"><option value="MB">MB</option><option value="GB">GB</option></select><input type="number" id="digitalAmount" value="1"></div><div class="unit-row"><select id="digitalTo"><option value="MB">MB</option><option value="GB">GB</option></select><input type="text" id="digitalResult" readonly></div><button onclick="convertDigital()">Convert</button></div></div>
+    <button class="back-btn" onclick="showPage('menu')">🔙 BACK</button>
+</div>
+
+<!-- GRAPHING PAGE -->
+<div id="graphingPage" class="hidden">
+    <h2>📈 2D Graphing & Transformations</h2>
+    <div class="graph-points-area">
+        <div style="margin-bottom:10px"><strong>📍 Points (x,y)</strong></div>
+        <input type="text" id="pointX" placeholder="x" style="width:60px">
+        <input type="text" id="pointY" placeholder="y" style="width:60px">
+        <button onclick="addPoint()">➕ Add Point</button>
+        <button onclick="clearPoints()">🗑 Clear</button>
+        <div style="margin-top:8px; font-size:12px; color:#aaa" id="pointsList">Points: (1,2) (3,5) or F</div>
+    </div>
+    <div class="function-input-area">
+        <span>f(x) =</span>
+        <input type="text" id="functionInput" value="x" placeholder="e.g., x, x^2, sin(x)" style="width:150px">
+        <button class="graph-btn" onclick="drawFunction()">🔑 Draw</button>
+    </div>
+    <div class="graph-canvas-container">
+        <canvas id="functionCanvas" width="500" height="400" style="width:100%; max-width:500px; aspect-ratio:500/400"></canvas>
+    </div>
+    <div class="transform-grid">
+        <button onclick="applyReflectX()">🪞 Reflect X</button>
+        <button onclick="applyReflectY()">🪞 Reflect Y</button>
+        <button onclick="resetTransform()">🔄 Reset</button>
+    </div>
+    <div class="result-box" id="graphInfo">f(x) = x | Points: None</div>
+    <button class="back-btn" onclick="showPage('menu')">🔙 Back to Menu</button>
+</div>
+
+<!-- GAME PAGES -->
+<div id="gameClick" class="hidden"><h2>⚡ Fast Click</h2><div id="clickArea" class="click-area">CLICK</div><div>Score: <span id="clickScore">0</span></div><div>Time: <span id="clickTimer">5.0</span>s</div><button id="resetClickBtn">Restart</button><button class="back-btn" onclick="showPage('menu')">BACK</button></div>
+<div id="gameMemory" class="hidden"><h2>🧠 Memory Game</h2><div id="memoryNumbers" class="memory-numbers">---</div><input id="memoryInput" placeholder="Enter 8 numbers"><button id="checkMemoryBtn">Verify</button><button id="newMemoryBtn">New</button><button class="back-btn" onclick="showPage('menu')">BACK</button></div>
+
+<!-- MATH PUZZLE - 5 SECONDS PER QUESTION -->
+<div id="gamePuzzle" class="hidden">
+    <h2>🧩 Math Puzzle Game</h2>
+    <select id="puzzleLevelSelect">
+        <option value="easy">😊 Easy (60 sec total)</option>
+        <option value="medium">🤔 Medium (15 sec per question)</option>
+        <option value="hard">🔥 Hard (5 sec per question)</option>
+    </select>
+    <button id="startPuzzleBtn">Start</button>
+    <div id="puzzleTimer">Time: --</div>
+    <div id="puzzleQuestion">Select level and press Start</div>
+    <div id="puzzleOptions"></div>
+    <div id="puzzleScore">Score: 0</div>
+    <button class="back-btn" onclick="showPage('menu')">BACK</button>
+</div>
+
+<!-- QUICK MATH - 10 SECONDS PER QUESTION -->
+<div id="gameMath" class="hidden">
+    <h2>➕ Quick Math (10 sec per question)</h2>
+    <div id="qmQuestion">5 + 3</div>
+    <input id="qmAnswer">
+    <button id="qmSubmit">Submit</button>
+    <div>Score: <span id="qmScore">0</span> | Time: <span id="qmTimer">10</span>s</div>
+    <button id="qmReset">Restart</button>
+    <button class="back-btn" onclick="showPage('menu')">BACK</button>
+</div>
+
+<!-- EXTRA PAGES -->
+<div id="percentagePage" class="hidden"><h2>Percentage</h2><input id="percentVal" placeholder="%" value="15"><input id="numberVal" placeholder="Number" value="200"><button onclick="calcPercentage()">Calculate</button><div class="result-box" id="percentResult"></div><button class="back-btn" onclick="showPage('menu')">BACK</button></div>
+<div id="meanPage" class="hidden"><h2>📈 Mean Calculator</h2><input id="numbersInput" placeholder="Enter numbers: 10,20,30"><button onclick="calcMean()">Calculate Mean</button><div class="result-box" id="meanResult"></div><div class="result-box" style="background:#1a1f3a"><strong>📖 What is Mean?</strong><br>The mean (average) is the sum of all numbers divided by how many numbers there are.<br><br>Example: (10+20+30) ÷ 3 = 20</div><button class="back-btn" onclick="showPage('menu')">BACK</button></div>
+<div id="bmiPage" class="hidden"><h2>BMI</h2><input id="weight" placeholder="kg"><input id="height" placeholder="cm"><button onclick="calcBMI()">Calculate</button><div class="result-box" id="bmiResult"></div><button class="back-btn" onclick="showPage('menu')">BACK</button></div>
+
+<!-- AGE CALCULATOR - Separate fields -->
+<div id="agePage" class="hidden">
+    <h2>🎂 Age Calculator</h2>
+    <div class="age-input-group">
+        <input type="number" id="yearInput" placeholder="Year (e.g., 1990)" style="width:100px">
+        <input type="number" id="monthInput" placeholder="Month (1-12)" style="width:100px">
+        <input type="number" id="dayInput" placeholder="Day (1-31)" style="width:100px">
+    </div>
+    <button onclick="calcAgeSimple()">Calculate Age</button>
+    <div class="result-box" id="ageResult"></div>
+    <button class="back-btn" onclick="showPage('menu')">BACK</button>
+</div>
+
+<div id="loanPage" class="hidden"><h2>Loan</h2><input id="loanAmount" placeholder="Amount"><input id="interestRate" placeholder="Interest %"><input id="loanYears" placeholder="Years"><button onclick="calcLoan()">Calculate</button><div class="result-box" id="loanResult"></div><button class="back-btn" onclick="showPage('menu')">BACK</button></div>
+
+</div>
+
+<!-- Popups -->
+<div id="globalPopup" class="popup-overlay"><div class="popup-content"><h3 id="popupTitle"></h3><p id="popupMessage"></p><button onclick="closePopup()">OK</button></div></div>
+<div id="shapePopup" class="popup-overlay"><div class="popup-content"><h3 id="shapeTitle"></h3><div id="shapeInputs"></div><div class="shape-popup-buttons"><button id="shapeCalcBtn" style="background:#4caf50">Calculate</button><button onclick="closeShapePopup()" style="background:#666">Close</button></div><div id="shapeResult" style="margin-top:15px"></div></div></div>
+<div id="physicsInputPopup" class="popup-overlay"><div class="popup-content"><h3 id="physicsPopupTitle"></h3><div id="physicsPopupFields"></div><button onclick="closePhysicsPopup()">Cancel</button></div></div>
+
+<script>
+// Stars
+function createStars(){for(let i=0;i<100;i++){let s=document.createElement('div');s.classList.add('star');s.style.width=Math.random()*2.5+1+'px';s.style.height=s.style.width;s.style.left=Math.random()*100+'%';s.style.animationDuration=Math.random()*6+2+'s';s.style.animationDelay=Math.random()*10+'s';document.getElementById('starsContainer').appendChild(s);}}createStars();
+
+// Navigation
+function showPage(id){['welcome','menu','math','physicsPage','shapesPage','convertersPage','graphingPage','gamePuzzle','gameClick','gameMemory','gameMath','percentagePage','meanPage','bmiPage','agePage','loanPage'].forEach(p=>document.getElementById(p).classList.add('hidden'));document.getElementById(id).classList.remove('hidden');if(id==='graphingPage')initGraphing();}
+document.getElementById('startBtn').onclick=()=>showPage('menu');
+
+function showPopup(t,m){document.getElementById('popupTitle').innerText=t;document.getElementById('popupMessage').innerHTML=m;document.getElementById('globalPopup').style.display='flex';}
+function closePopup(){document.getElementById('globalPopup').style.display='none';}
+
+// Math
+function addMath(v){document.getElementById('mathInput').value+=v;}
+function clearMath(){document.getElementById('mathInput').value='';document.getElementById('mathRes').innerHTML='Result: ---';}
+function calculateMath(){try{let r=eval(document.getElementById('mathInput').value.replace(/sin/g,'Math.sin').replace(/cos/g,'Math.cos').replace(/tan/g,'Math.tan'));document.getElementById('mathRes').innerHTML=`Result: ${r}`;}catch(e){document.getElementById('mathRes').innerHTML='Error';}}
+
+// ==================== PHYSICS - 20 LAWS ====================
+const physicsLaws = [
+    { name: "Newton's 2nd Law", formula: "F = m × a", inputs: ["mass (m) in kg", "acceleration (a) in m/s²"], calc: v => v[0] * v[1], unit: "N" },
+    { name: "Ohm's Law", formula: "V = I × R", inputs: ["current (I) in Amps", "resistance (R) in Ohms"], calc: v => v[0] * v[1], unit: "Volts" },
+    { name: "Force (Weight)", formula: "W = m × g", inputs: ["mass (m) in kg", "gravity (g) in m/s² (default 9.8)"], calc: v => v[0] * (v[1] || 9.8), unit: "N" },
+    { name: "Kinetic Energy", formula: "KE = ½ × m × v²", inputs: ["mass (m) in kg", "velocity (v) in m/s"], calc: v => 0.5 * v[0] * Math.pow(v[1], 2), unit: "Joules" },
+    { name: "Pressure", formula: "P = F / A", inputs: ["force (F) in N", "area (A) in m²"], calc: v => v[0] / v[1], unit: "Pascals" },
+    { name: "Momentum", formula: "p = m × v", inputs: ["mass (m) in kg", "velocity (v) in m/s"], calc: v => v[0] * v[1], unit: "kg·m/s" },
+    { name: "Work", formula: "W = F × d", inputs: ["force (F) in N", "distance (d) in m"], calc: v => v[0] * v[1], unit: "Joules" },
+    { name: "Power", formula: "P = W / t", inputs: ["work (W) in Joules", "time (t) in seconds"], calc: v => v[0] / v[1], unit: "Watts" },
+    { name: "Density", formula: "ρ = m / V", inputs: ["mass (m) in kg", "volume (V) in m³"], calc: v => v[0] / v[1], unit: "kg/m³" },
+    { name: "Hooke's Law", formula: "F = k × x", inputs: ["spring constant (k) in N/m", "displacement (x) in m"], calc: v => v[0] * v[1], unit: "N" },
+    { name: "Gravitational Force", formula: "F = G·m₁·m₂/r²", inputs: ["mass1 (kg)", "mass2 (kg)", "distance (m)"], calc: v => (6.674e-11 * v[0] * v[1]) / Math.pow(v[2], 2), unit: "N" },
+    { name: "Coulomb's Law", formula: "F = k·q₁·q₂/r²", inputs: ["charge1 (C)", "charge2 (C)", "distance (m)"], calc: v => (8.99e9 * v[0] * v[1]) / Math.pow(v[2], 2), unit: "N" },
+    { name: "Potential Energy", formula: "PE = m × g × h", inputs: ["mass (kg)", "height (m)", "gravity (m/s²) default 9.8"], calc: v => v[0] * (v[2] || 9.8) * v[1], unit: "Joules" },
+    { name: "Frequency", formula: "f = 1 / T", inputs: ["period (T) in seconds"], calc: v => 1 / v[0], unit: "Hz" },
+    { name: "Wavelength", formula: "λ = v / f", inputs: ["velocity (m/s)", "frequency (Hz)"], calc: v => v[0] / v[1], unit: "m" },
+    { name: "Ohm's Law (Resistance)", formula: "R = V / I", inputs: ["voltage (V)", "current (I) in Amps"], calc: v => v[0] / v[1], unit: "Ohms" },
+    { name: "Electrical Power", formula: "P = V × I", inputs: ["voltage (V)", "current (I) in Amps"], calc: v => v[0] * v[1], unit: "Watts" },
+    { name: "Capacitance", formula: "C = Q / V", inputs: ["charge (Q) in Coulombs", "voltage (V)"], calc: v => v[0] / v[1], unit: "Farads" },
+    { name: "Resistance (Temperature)", formula: "R = R₀(1 + αΔT)", inputs: ["R₀ (Ohms)", "α (coefficient)", "ΔT (°C)"], calc: v => v[0] * (1 + v[1] * v[2]), unit: "Ohms" },
+    { name: "Speed of Sound", formula: "v = 331 + 0.6×T", inputs: ["temperature (°C)"], calc: v => 331 + 0.6 * v[0], unit: "m/s" }
+];
+
+function showPhysicsLaw(law) {
+    let popup = document.getElementById('physicsInputPopup');
+    let fieldsDiv = document.getElementById('physicsPopupFields');
+    document.getElementById('physicsPopupTitle').innerHTML = `${law.name}<br><small style="font-size:11px">${law.formula}</small>`;
+    fieldsDiv.innerHTML = '';
+    law.inputs.forEach((input, idx) => {
+        let div = document.createElement('div');
+        div.innerHTML = `<input type="number" id="phys_${idx}" placeholder="${input}" step="any" style="width:90%">`;
+        fieldsDiv.appendChild(div);
+    });
+    let calcBtn = document.createElement('button');
+    calcBtn.innerText = 'Calculate';
+    calcBtn.style.background = '#4caf50';
+    calcBtn.onclick = () => {
+        let vals = [];
+        for (let i = 0; i < law.inputs.length; i++) {
+            let val = parseFloat(document.getElementById(`phys_${i}`).value);
+            if (isNaN(val)) { showPopup('Error', 'Please enter all values'); return; }
+            vals.push(val);
+        }
+        let result = law.calc(vals);
+        showPopup(law.name, `Result: ${result.toFixed(4)} ${law.unit}`);
+        closePhysicsPopup();
+    };
+    fieldsDiv.appendChild(calcBtn);
+    popup.style.display = 'flex';
+}
+
+function closePhysicsPopup() { document.getElementById('physicsInputPopup').style.display = 'none'; }
+
+function buildPhysicsGrid() {
+    let grid = document.getElementById('physicsGrid');
+    grid.innerHTML = '';
+    physicsLaws.forEach(law => {
+        let btn = document.createElement('button');
+        btn.innerText = law.name;
+        btn.onclick = () => showPhysicsLaw(law);
+        grid.appendChild(btn);
+    });
+}
+buildPhysicsGrid();
+
+// ==================== SHAPES WITH VOLUME/AREA CHOICE ====================
+function toggleShapes(type){
+    let d2=document.getElementById('shapes2d'), d3=document.getElementById('shapes3d');
+    if(type==='2d'){d2.classList.toggle('hidden');d3.classList.add('hidden');}
+    else{d3.classList.toggle('hidden');d2.classList.add('hidden');}
+}
+
+function openShapePopup(shapeName, dimension) {
+    let title = document.getElementById('shapeTitle');
+    let div = document.getElementById('shapeInputs');
+    div.innerHTML = '';
+    
+    // Define inputs based on shape
+    let inputs = [];
+    let formulaText = "";
+    
+    switch(shapeName.toLowerCase()) {
+        case 'square': inputs = ['side']; formulaText = "Area = side²"; break;
+        case 'rectangle': inputs = ['length', 'width']; formulaText = "Area = length × width"; break;
+        case 'circle': inputs = ['radius']; formulaText = "Area = πr²"; break;
+        case 'triangle': inputs = ['base', 'height']; formulaText = "Area = ½ × base × height"; break;
+        case 'parallelogram': inputs = ['base', 'height']; formulaText = "Area = base × height"; break;
+        case 'trapezoid': inputs = ['base1', 'base2', 'height']; formulaText = "Area = ½ × (b1+b2) × h"; break;
+        case 'ellipse': inputs = ['a (semi-major)', 'b (semi-minor)']; formulaText = "Area = π × a × b"; break;
+        case 'hexagon': inputs = ['side']; formulaText = "Area = (3√3/2) × side²"; break;
+        case 'cube': inputs = ['side']; formulaText = "Volume = side³, Surface = 6×side²"; break;
+        case 'sphere': inputs = ['radius']; formulaText = "Volume = (4/3)πr³, Surface = 4πr²"; break;
+        case 'cone': inputs = ['radius', 'height']; formulaText = "Volume = (1/3)πr²h, Surface = πr(r+√(h²+r²))"; break;
+        case 'pyramid': inputs = ['base area', 'height']; formulaText = "Volume = (1/3) × base area × height"; break;
+        case 'cylinder': inputs = ['radius', 'height']; formulaText = "Volume = πr²h, Surface = 2πr(r+h)"; break;
+        case 'rectangular prism': inputs = ['length', 'width', 'height']; formulaText = "Volume = l×w×h, Surface = 2(lw+lh+wh)"; break;
+        default: inputs = ['value'];
+    }
+    
+    title.innerHTML = `${shapeName.toUpperCase()}<br><small>${formulaText}</small>`;
+    
+    // Add input fields
+    inputs.forEach(inp => {
+        let input = document.createElement('input');
+        input.placeholder = inp;
+        input.className = 'shape-popup-input';
+        input.type = 'number';
+        div.appendChild(input);
+    });
+    
+    // Add calculation type selector for 3D shapes
+    if(dimension === '3d') {
+        let selectorDiv = document.createElement('div');
+        selectorDiv.className = 'shape-selector';
+        selectorDiv.innerHTML = `
+            <label style="margin-right:10px">Calculate:</label>
+            <select id="calcTypeSelect" style="padding:5px 10px;border-radius:8px;background:#1a1f3a;color:white;border:1px solid #ff9a9e">
+                <option value="volume">📦 Volume</option>
+                <option value="surface">📐 Surface Area</option>
+            </select>
+        `;
+        div.appendChild(selectorDiv);
+    }
+    
+    document.getElementById('shapeResult').innerHTML = '';
+    document.getElementById('shapePopup').style.display = 'flex';
+    
+    document.getElementById('shapeCalcBtn').onclick = () => {
+        let inputs = div.querySelectorAll('input');
+        let vals = [];
+        for(let inp of inputs) {
+            if(inp.type === 'number') {
+                let v = parseFloat(inp.value);
+                if(isNaN(v)) {
+                    showPopup('Error', 'Please enter all values');
+                    return;
+                }
+                vals.push(v);
+            }
+        }
+        
+        let result = 0;
+        let resultUnit = "";
+        let calcType = dimension === '3d' ? document.getElementById('calcTypeSelect').value : 'area';
+        
+        switch(shapeName.toLowerCase()) {
+            // 2D Shapes
+            case 'square': result = vals[0] ** 2; resultUnit = "units²"; break;
+            case 'rectangle': result = vals[0] * vals[1]; resultUnit = "units²"; break;
+            case 'circle': result = Math.PI * vals[0] ** 2; resultUnit = "units²"; break;
+            case 'triangle': result = 0.5 * vals[0] * vals[1]; resultUnit = "units²"; break;
+            case 'parallelogram': result = vals[0] * vals[1]; resultUnit = "units²"; break;
+            case 'trapezoid': result = 0.5 * (vals[0] + vals[1]) * vals[2]; resultUnit = "units²"; break;
+            case 'ellipse': result = Math.PI * vals[0] * vals[1]; resultUnit = "units²"; break;
+            case 'hexagon': result = (3 * Math.sqrt(3) / 2) * vals[0] ** 2; resultUnit = "units²"; break;
+            // 3D Shapes
+            case 'cube': 
+                if(calcType === 'volume') { result = vals[0] ** 3; resultUnit = "units³"; }
+                else { result = 6 * vals[0] ** 2; resultUnit = "units²"; }
+                break;
+            case 'sphere':
+                if(calcType === 'volume') { result = (4/3) * Math.PI * vals[0] ** 3; resultUnit = "units³"; }
+                else { result = 4 * Math.PI * vals[0] ** 2; resultUnit = "units²"; }
+                break;
+            case 'cone':
+                if(calcType === 'volume') { result = (1/3) * Math.PI * vals[0] ** 2 * vals[1]; resultUnit = "units³"; }
+                else { 
+                    let slant = Math.sqrt(vals[1]**2 + vals[0]**2);
+                    result = Math.PI * vals[0] * (vals[0] + slant); 
+                    resultUnit = "units²";
+                }
+                break;
+            case 'pyramid':
+                if(calcType === 'volume') { result = (1/3) * vals[0] * vals[1]; resultUnit = "units³"; }
+                else { result = "Surface area needs base perimeter + slant height"; resultUnit = ""; }
+                break;
+            case 'cylinder':
+                if(calcType === 'volume') { result = Math.PI * vals[0] ** 2 * vals[1]; resultUnit = "units³"; }
+                else { result = 2 * Math.PI * vals[0] * (vals[0] + vals[1]); resultUnit = "units²"; }
+                break;
+            case 'rectangular prism':
+                if(calcType === 'volume') { result = vals[0] * vals[1] * vals[2]; resultUnit = "units³"; }
+                else { result = 2 * (vals[0]*vals[1] + vals[0]*vals[2] + vals[1]*vals[2]); resultUnit = "units²"; }
+                break;
+            default: result = vals[0];
+        }
+        
+        let calcTypeText = "";
+        if(dimension === '3d') calcTypeText = calcType === 'volume' ? 'Volume' : 'Surface Area';
+        else calcTypeText = 'Area';
+        
+        document.getElementById('shapeResult').innerHTML = `<strong>${calcTypeText}: ${result.toFixed(4)} ${resultUnit}</strong>`;
+    };
+}
+
+function closeShapePopup(){document.getElementById('shapePopup').style.display='none';}
+
+// Converters
+function showConverter(t){document.querySelectorAll('.converter-panel').forEach(p=>p.classList.remove('active'));document.getElementById(t+'Conv').classList.add('active');}
+let rates={USD:1,EUR:0.92,IQD:1310};
+function convertCurrency(){let f=document.getElementById('fromCurrency').value,t=document.getElementById('toCurrency').value,a=parseFloat(document.getElementById('fromAmount').value);document.getElementById('toAmount').value=((a/rates[f])*rates[t]).toFixed(2);}
+function convertHeat(){let f=document.getElementById('heatFrom').value,t=document.getElementById('heatTo').value,v=parseFloat(document.getElementById('heatAmount').value);let c=f=='C'?v:(v-32)*5/9;document.getElementById('heatResult').value=t=='C'?c.toFixed(2):(c*9/5+32).toFixed(2);}
+function convertWeight(){let f=document.getElementById('weightFrom').value,t=document.getElementById('weightTo').value,v=parseFloat(document.getElementById('weightAmount').value);let kg=f=='kg'?v:v*0.453592;document.getElementById('weightResult').value=t=='kg'?kg.toFixed(3):(kg/0.453592).toFixed(3);}
+function convertLength(){let f=document.getElementById('lengthFrom').value,t=document.getElementById('lengthTo').value,v=parseFloat(document.getElementById('lengthAmount').value);let m=f=='m'?v:(f=='cm'?v/100:v*0.0254);document.getElementById('lengthResult').value=t=='m'?m.toFixed(3):(t=='cm'?m*100:m/0.0254).toFixed(3);}
+function convertSpeed(){let f=document.getElementById('speedFrom').value,t=document.getElementById('speedTo').value,v=parseFloat(document.getElementById('speedAmount').value);let mps=f=='mps'?v:v/3.6;document.getElementById('speedResult').value=t=='mps'?mps.toFixed(3):(mps*3.6).toFixed(3);}
+function convertVolume(){let f=document.getElementById('volumeFrom').value,t=document.getElementById('volumeTo').value,v=parseFloat(document.getElementById('volumeAmount').value);let L=f=='L'?v:v*1000;document.getElementById('volumeResult').value=t=='L'?L.toFixed(3):(L/1000).toFixed(3);}
+function convertDigital(){let f=document.getElementById('digitalFrom').value,t=document.getElementById('digitalTo').value,v=parseFloat(document.getElementById('digitalAmount').value);let mb=f=='MB'?v:v*1024;document.getElementById('digitalResult').value=t=='MB'?mb.toFixed(3):(mb/1024).toFixed(3);}
+
+// Graphing
+let canvas,ctx,funcStr='x',points=[],reflectX=false,reflectY=false,transX=0,transY=0;
+function initGraphing(){canvas=document.getElementById('functionCanvas');if(canvas){ctx=canvas.getContext('2d');drawAll();}}
+function drawFunction(){funcStr=document.getElementById('functionInput').value;drawAll();}
+function addPoint(){let x=parseFloat(document.getElementById('pointX').value),y=parseFloat(document.getElementById('pointY').value);if(!isNaN(x)&&!isNaN(y)){points.push({x,y});document.getElementById('pointsList').innerHTML=`Points: ${points.map(p=>`(${p.x},${p.y})`).join(' ')}`;drawAll();}else showPopup('Error','Enter valid numbers');}
+function clearPoints(){points=[];document.getElementById('pointsList').innerHTML='Points: (1,2) (3,5) or F';drawAll();}
+function applyReflectX(){reflectX=!reflectX;drawAll();}
+function applyReflectY(){reflectY=!reflectY;drawAll();}
+function applySymmetry(){reflectX=true;reflectY=true;drawAll();}
+function applyTranslateX(){transX+=2;drawAll();}
+function applyTranslateY(){transY+=2;drawAll();}
+function resetTransform(){reflectX=false;reflectY=false;transX=0;transY=0;drawAll();}
+function f(x){try{return eval(funcStr.replace(/\^/g,'**').replace(/sin/g,'Math.sin').replace(/cos/g,'Math.cos').replace(/tan/g,'Math.tan').replace(/pi/g,'Math.PI'));}catch(e){return x;}}
+function drawAll(){if(!ctx||!canvas)return;let w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);ctx.strokeStyle='#ffffff30';for(let i=0;i<=w;i+=50){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,h);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(w,i);ctx.stroke();}ctx.beginPath();ctx.moveTo(w/2,0);ctx.lineTo(w/2,h);ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.strokeStyle='#fff';ctx.stroke();ctx.beginPath();ctx.strokeStyle='#ff9a9e';ctx.lineWidth=3;let first=true;for(let px=0;px<=w;px++){let x=(px-w/2)/35;let y=f(x);if(reflectY)x=-x;if(reflectX)y=-y;x+=transX/35;y+=transY/35;let cx=x*35+w/2,cy=h/2-y*35;if(cx<0||cx>w||cy<0||cy>h){first=true;continue;}if(first){ctx.moveTo(cx,cy);first=false;}else ctx.lineTo(cx,cy);}ctx.stroke();ctx.fillStyle='#ff3333';points.forEach(p=>{let x=p.x,y=p.y;if(reflectY)x=-x;if(reflectX)y=-y;x+=transX/35;y+=transY/35;let cx=x*35+w/2,cy=h/2-y*35;if(cx>=0&&cx<=w&&cy>=0&&cy<=h){ctx.beginPath();ctx.arc(cx,cy,6,0,2*Math.PI);ctx.fill();ctx.fillStyle='#fff';ctx.font='11px Arial';ctx.fillText(`(${p.x},${p.y})`,cx+8,cy-5);ctx.fillStyle='#ff3333';}});document.getElementById('graphInfo').innerHTML=`f(x) = ${funcStr} | Points: ${points.length}`;}
+
+// Fast Click
+let clickScore=0,clickTime=5,clickInt=null,clickActive=false;
+function startClick(){if(clickInt)clearInterval(clickInt);clickScore=0;clickTime=5;clickActive=true;document.getElementById('clickScore').innerText='0';document.getElementById('clickTimer').innerText='5.0';clickInt=setInterval(()=>{if(clickTime<=0){clearInterval(clickInt);clickActive=false;showPopup('Game Over',`Score: ${clickScore}`);}else{clickTime-=0.1;document.getElementById('clickTimer').innerText=clickTime.toFixed(1);}},100);}
+document.getElementById('clickArea')&&(document.getElementById('clickArea').onclick=()=>{if(!clickActive)startClick();if(clickActive&&clickTime>0){clickScore++;document.getElementById('clickScore').innerText=clickScore;}});
+document.getElementById('resetClickBtn')&&(document.getElementById('resetClickBtn').onclick=()=>{if(clickInt)clearInterval(clickInt);clickActive=false;clickScore=0;clickTime=5;document.getElementById('clickScore').innerText='0';document.getElementById('clickTimer').innerText='5.0';});
+
+// Memory Game
+let seq=[],memTimeout;
+function genSeq(){seq=[];for(let i=0;i<8;i++)seq.push(Math.floor(Math.random()*10));document.getElementById('memoryNumbers').innerHTML=seq.join(' ');if(memTimeout)clearTimeout(memTimeout);memTimeout=setTimeout(()=>document.getElementById('memoryNumbers').innerHTML='? ? ? ? ? ? ? ?',3000);}
+document.getElementById('newMemoryBtn')&&(document.getElementById('newMemoryBtn').onclick=genSeq);
+document.getElementById('checkMemoryBtn')&&(document.getElementById('checkMemoryBtn').onclick=()=>{let u=document.getElementById('memoryInput').value.split(/[ ,]+/).map(Number);let ok=u.length===8&&u.every((v,i)=>v===seq[i]);showPopup('Memory',ok?'✅ Correct! Great memory!':'❌ Wrong!');if(ok)genSeq();});
+genSeq();
+
+// ==================== MATH PUZZLE (Improved with per-question timer) ====================
+let puzzleTimer = null;
+let puzzleScore = 0;
+let puzzleActive = false;
+let currentAns = null;
+let timeLeftForCurrentQuestion = 5;
+
+document.getElementById('startPuzzleBtn') && (document.getElementById('startPuzzleBtn').onclick = () => {
+    if (puzzleTimer) clearInterval(puzzleTimer);
+    puzzleScore = 0;
+    puzzleActive = true;
+    document.getElementById('puzzleScore').innerHTML = '⭐ Score: 0';
+    generatePuzzleQuestion();
+    startQuestionTimer();
+});
+
+function startQuestionTimer() {
+    if (!puzzleActive) return;
+    
+    let level = document.getElementById('puzzleLevelSelect').value;
+    let maxTime = level === 'easy' ? 60 : (level === 'medium' ? 15 : 5);
+    timeLeftForCurrentQuestion = maxTime;
+    document.getElementById('puzzleTimer').innerHTML = `⏱️ Time: ${timeLeftForCurrentQuestion}s`;
+    
+    if (puzzleTimer) clearInterval(puzzleTimer);
+    
+    puzzleTimer = setInterval(() => {
+        if (!puzzleActive) return;
+        
+        timeLeftForCurrentQuestion--;
+        document.getElementById('puzzleTimer').innerHTML = `⏱️ Time: ${timeLeftForCurrentQuestion}s`;
+        
+        if (timeLeftForCurrentQuestion <= 0) {
+            clearInterval(puzzleTimer);
+            showPopup('⏰ Time\'s Up!', `The correct answer was ${currentAns}. Moving to next question.`);
+            generatePuzzleQuestion();
+            startQuestionTimer();
+        }
+    }, 1000);
+}
+
+function generatePuzzleQuestion() {
+    let level = document.getElementById('puzzleLevelSelect').value;
+    let a, b, op;
+    
+    if(level === 'easy') {
+        a = Math.floor(Math.random() * 20) + 1;
+        b = Math.floor(Math.random() * 20) + 1;
+        op = ['+', '-', '*'][Math.floor(Math.random() * 3)];
+        if(op === '-') { if(a < b) { let temp = a; a = b; b = temp; } }
+        if(op === '*') { a = Math.min(a, 10); b = Math.min(b, 10); }
+    } 
+    else if(level === 'medium') {
+        a = Math.floor(Math.random() * 30) + 10;
+        b = Math.floor(Math.random() * 20) + 5;
+        op = ['+', '-', '*', '/'][Math.floor(Math.random() * 4)];
+        if(op === '-') { if(a < b) { let temp = a; a = b; b = temp; } }
+        if(op === '*') { a = Math.min(a, 15); b = Math.min(b, 12); }
+        if(op === '/') { a = a * b; }
+    } 
+    else {
+        a = Math.floor(Math.random() * 50) + 20;
+        b = Math.floor(Math.random() * 30) + 5;
+        op = ['+', '-', '*', '/', '**'][Math.floor(Math.random() * 5)];
+        if(op === '-') { if(a < b) { let temp = a; a = b; b = temp; } }
+        if(op === '*') { a = Math.min(a, 20); b = Math.min(b, 15); }
+        if(op === '/') { a = a * b; }
+        if(op === '**') { a = Math.min(a, 5); b = Math.min(b, 3); }
+    }
+    
+    let answer;
+    switch(op) {
+        case '+': answer = a + b; break;
+        case '-': answer = a - b; break;
+        case '*': answer = a * b; break;
+        case '/': answer = a / b; break;
+        case '**': answer = Math.pow(a, b); break;
+        default: answer = a + b;
+    }
+    currentAns = answer;
+    
+    let opSymbol = op;
+    document.getElementById('puzzleQuestion').innerHTML = `❓ ${a} ${opSymbol} ${b} = ?`;
+    
+    let options = [currentAns];
+    while(options.length < 3) {
+        let wrong = currentAns + Math.floor(Math.random() * 15) - 7;
+        if(wrong !== currentAns && !options.includes(wrong) && wrong > 0) options.push(wrong);
+    }
+    options.sort(() => Math.random() - 0.5);
+    
+    let optsDiv = document.getElementById('puzzleOptions');
+    optsDiv.innerHTML = '';
+    options.forEach(opt => {
+        let btn = document.createElement('button');
+        btn.innerText = opt;
+        btn.style.background = '#ff8c42';
+        btn.onclick = () => {
+            if(!puzzleActive) return;
+            if(opt === currentAns) {
+                puzzleScore++;
+                document.getElementById('puzzleScore').innerHTML = `⭐ Score: ${puzzleScore}`;
+                btn.classList.add('correct-answer');
+                showPopup('✅ Correct! 🎉', `Great job! +1 point! Total: ${puzzleScore}`);
+                clearInterval(puzzleTimer);
+                generatePuzzleQuestion();
+                startQuestionTimer();
+            } else {
+                showPopup('❌ Wrong!', `Correct answer was ${currentAns}`);
+                clearInterval(puzzleTimer);
+                generatePuzzleQuestion();
+                startQuestionTimer();
+            }
+        };
+        optsDiv.appendChild(btn);
+    });
+}
+
+// ==================== QUICK MATH - 10 SECONDS PER QUESTION ====================
+let qmScore = 0;
+let qmTime = 10;
+let qmInt = null;
+let qmActive = false;
+let qmAns = 0;
+
+function genQM() {
+    let a = Math.floor(Math.random() * 20) + 1;
+    let b = Math.floor(Math.random() * 20) + 1;
+    let op = ['+', '-', '*'][Math.floor(Math.random() * 3)];
+    if (op === '-' && a < b) [a, b] = [b, a];
+    qmAns = op === '+' ? a + b : (op === '-' ? a - b : a * b);
+    document.getElementById('qmQuestion').innerHTML = `${a} ${op} ${b} = ?`;
+}
+
+function startQM() {
+    if (qmInt) clearInterval(qmInt);
+    qmScore = 0;
+    qmTime = 10;
+    qmActive = true;
+    document.getElementById('qmScore').innerText = '0';
+    document.getElementById('qmTimer').innerText = '10';
+    genQM();
+    
+    qmInt = setInterval(() => {
+        if (!qmActive) return;
+        qmTime--;
+        document.getElementById('qmTimer').innerText = qmTime;
+        
+        if (qmTime <= 0) {
+            clearInterval(qmInt);
+            qmActive = false;
+            showPopup('Time\'s up!', `Your final score: ${qmScore}`);
+        }
+    }, 1000);
+}
+
+document.getElementById('qmSubmit') && (document.getElementById('qmSubmit').onclick = () => {
+    if (!qmActive) {
+        startQM();
+        return;
+    }
+    let ans = parseInt(document.getElementById('qmAnswer').value);
+    if (ans === qmAns) {
+        qmScore++;
+        document.getElementById('qmScore').innerText = qmScore;
+        qmTime = 10;
+        document.getElementById('qmTimer').innerText = '10';
+        genQM();
+        document.getElementById('qmAnswer').value = '';
+    } else {
+        showPopup('Wrong!', `Correct answer was ${qmAns}`);
+        qmTime = 10;
+        document.getElementById('qmTimer').innerText = '10';
+        genQM();
+        document.getElementById('qmAnswer').value = '';
+    }
+});
+
+document.getElementById('qmReset') && (document.getElementById('qmReset').onclick = () => {
+    if (qmInt) clearInterval(qmInt);
+    qmActive = false;
+    startQM();
+});
+
+startQM();
+
+// Extra tools
+function calcPercentage(){let p=parseFloat(document.getElementById('percentVal').value),n=parseFloat(document.getElementById('numberVal').value);document.getElementById('percentResult').innerHTML=`Result: ${(p/100)*n}`;}
+function calcMean(){let nums=document.getElementById('numbersInput').value.split(',').map(Number);let sum=nums.reduce((a,b)=>a+b,0);document.getElementById('meanResult').innerHTML=`Mean: ${(sum/nums.length).toFixed(2)}<br><br>📖 Mean = Sum ÷ Count<br>= ${sum} ÷ ${nums.length} = ${(sum/nums.length).toFixed(2)}`;}
+function calcBMI(){let w=parseFloat(document.getElementById('weight').value),h=parseFloat(document.getElementById('height').value)/100,bmi=w/(h*h);let s=bmi<18.5?'Underweight':bmi<25?'Normal':bmi<30?'Overweight':'Obese';document.getElementById('bmiResult').innerHTML=`BMI: ${bmi.toFixed(1)} - ${s}`;}
+
+function calcAgeSimple() {
+    let year = parseInt(document.getElementById('yearInput').value);
+    let month = parseInt(document.getElementById('monthInput').value);
+    let day = parseInt(document.getElementById('dayInput').value);
+    
+    if(isNaN(year) || isNaN(month) || isNaN(day)) {
+        showPopup('Error', 'Please enter valid year, month, and day');
+        return;
+    }
+    
+    let birthDate = new Date(year, month - 1, day);
+    let today = new Date();
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+    let days = today.getDate() - birthDate.getDate();
+    
+    if(days < 0) { months--; days += new Date(today.getFullYear(), today.getMonth(), 0).getDate(); }
+    if(months < 0) { years--; months += 12; }
+    
+    document.getElementById('ageResult').innerHTML = `Age: ${years} years, ${months} months, ${days} days`;
+}
+
+function calcLoan(){let P=parseFloat(document.getElementById('loanAmount').value),r=parseFloat(document.getElementById('interestRate').value)/100/12,n=parseFloat(document.getElementById('loanYears').value)*12,monthly=(P*r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);document.getElementById('loanResult').innerHTML=`Monthly: ${monthly.toFixed(2)}<br>Total: ${(monthly*n).toFixed(2)}<br>Interest: ${(monthly*n-P).toFixed(2)}`;}
+
+showPage('welcome');
+</script>
+</body>
+</html>zx
